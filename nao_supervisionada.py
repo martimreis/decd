@@ -190,3 +190,42 @@ metrics.to_csv("output/12_clustering_metrics.csv", index=False)
 print(metrics)
 print(f"Best k (K-Means): {best_k}")
 print(f"Best eps (DBSCAN): {best_eps}")
+
+# ==================================================
+# 4.1) TABELA VISUAL DAS MÉTRICAS
+# ==================================================
+metrics_display = metrics.copy()
+metrics_display["k"] = metrics_display["k"].apply(lambda x: "-" if pd.isna(x) else int(x))
+metrics_display["eps"] = metrics_display["eps"].apply(lambda x: "-" if pd.isna(x) else f"{x:.2f}")
+metrics_display["Silhouette"] = metrics_display["Silhouette"].apply(lambda x: f"{x:.4f}")
+metrics_display["Davies-Bouldin"] = metrics_display["Davies-Bouldin"].apply(lambda x: f"{x:.4f}")
+metrics_display["Calinski-Harabasz"] = metrics_display["Calinski-Harabasz"].apply(lambda x: f"{x:.2f}")
+
+fig, ax = plt.subplots(figsize=(11, 2.8))
+ax.axis("off")
+
+table = ax.table(
+    cellText=metrics_display.values,
+    colLabels=metrics_display.columns,
+    cellLoc="center",
+    loc="center"
+)
+
+table.auto_set_font_size(False)
+table.set_fontsize(10.5)
+table.scale(1, 1.6)
+
+for (row, col), cell in table.get_celld().items():
+    if row == 0:
+        cell.set_text_props(weight="bold", color="white")
+        cell.set_facecolor("#2f5d62")
+    elif row % 2 == 1:
+        cell.set_facecolor("#f3f6f6")
+    else:
+        cell.set_facecolor("#ffffff")
+    cell.set_edgecolor("#c9d1d3")
+
+plt.tight_layout()
+plt.savefig("output/12_clustering_metrics_table.png", dpi=200, bbox_inches="tight")
+plt.show()
+plt.close()
