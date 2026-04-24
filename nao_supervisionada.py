@@ -50,8 +50,6 @@ kmeans_labels_model = kmeans.fit_predict(X_model)
 pca = PCA(n_components=2, random_state=42)
 X_plot_pca = pca.fit_transform(X_plot)
 kmeans_plot = KMeans(n_clusters=best_k, random_state=42, n_init=10).fit(X_model)
-# usar predição no conjunto de plot via centroides não é direto com subsets diferentes,
-# então ajusta-se um KMeans também no subset de plot para visualização
 kmeans_plot_model = KMeans(n_clusters=best_k, random_state=42, n_init=10)
 kmeans_plot_labels = kmeans_plot_model.fit_predict(X_plot)
 X_plot_pca = pca.fit_transform(X_plot)
@@ -83,7 +81,25 @@ plt.colorbar(label="Cluster")
 plt.tight_layout()
 plt.savefig("output/08_kmeans_clusters_pca.png", dpi=200, bbox_inches="tight")
 plt.show()
+# ==================================================
+# 1.1) PERFIL DOS CLUSTERS DO K-MEANS POR ATRIBUTO
+# ==================================================
+df_kmeans = X_plot.copy()
+df_kmeans["cluster"] = kmeans_plot_labels
 
+print("\n--- MÉDIAS POR CLUSTER (K-MEANS) ---")
+print(df_kmeans.groupby("cluster").mean().round(2))
+
+print("\n--- MEDIANAS POR CLUSTER (K-MEANS) ---")
+print(df_kmeans.groupby("cluster").median().round(2))
+
+for col in df_kmeans.columns.drop("cluster"):
+    plt.figure(figsize=(10, 5))
+    sns.boxplot(data=df_kmeans, x="cluster", y=col)
+    plt.title(f"{col} por cluster - K-Means")
+    plt.tight_layout()
+    plt.savefig(f"output/kmeans_{col}_por_cluster.png", dpi=200, bbox_inches="tight")
+    plt.show()
 # ==================================================
 # 2) CLUSTERING HIERÁRQUICO
 # ==================================================

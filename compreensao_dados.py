@@ -2,8 +2,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
 sns.set_theme(style="whitegrid")
+os.makedirs("output", exist_ok=True)
 
 # 1. Ler os dados
 df = pd.read_csv("CVD_cleaned.csv")
@@ -50,7 +52,6 @@ vars_prioritarias = [
     "Heart_Disease"
 ]
 
-
 print("\n--- DESCRIBE VARIÁVEIS PRIORITÁRIAS ---")
 print(df[vars_prioritarias].describe(include='all').round(2))
 for col in vars_prioritarias:
@@ -81,12 +82,14 @@ plt.figure(figsize=(10, 8))
 sns.heatmap(corr, annot=True, cmap="coolwarm", fmt=".2f")
 plt.title("Matriz de Correlação")
 plt.tight_layout()
+plt.savefig("output/01_matriz_correlacao.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 # 9. Histogramas das variáveis numéricas
 df[num_cols].hist(figsize=(14, 10), bins=30)
 plt.suptitle("Distribuições das Variáveis Numéricas")
 plt.tight_layout()
+plt.savefig("output/02_histogramas_numericas.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 # 10. Boxplots para detetar outliers
@@ -96,15 +99,26 @@ for i, col in enumerate(num_cols, 1):
     sns.boxplot(y=df[col])
     plt.title(col)
 plt.tight_layout()
+plt.savefig("output/03_boxplots_outliers.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 # 11. Gráficos de barras para variáveis prioritárias
+age_order = [
+    "18-24", "25-29", "30-34", "35-39", "40-44",
+    "45-49", "50-54", "55-59", "60-64", "65-69",
+    "70-74", "75-79", "80+"
+]
+
 for col in ["Age_Category", "Smoking_History", "Exercise", "Diabetes", "Heart_Disease"]:
     plt.figure(figsize=(8, 4))
-    df[col].value_counts().plot(kind="bar")
+    if col == "Age_Category":
+        sns.countplot(data=df, x=col, order=age_order)
+    else:
+        df[col].value_counts().plot(kind="bar")
     plt.title(f"Distribuição de {col}")
     plt.xticks(rotation=45)
     plt.tight_layout()
+    plt.savefig(f"output/04_{col}_distribuicao.png", dpi=300, bbox_inches="tight")
     plt.show()
 
 # 12. Relações com o target Heart_Disease
@@ -112,13 +126,15 @@ plt.figure(figsize=(8, 5))
 sns.boxplot(data=df, x="Heart_Disease", y="BMI")
 plt.title("BMI por Heart_Disease")
 plt.tight_layout()
+plt.savefig("output/05_bmi_por_heart_disease.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 plt.figure(figsize=(10, 5))
-sns.countplot(data=df, x="Age_Category", hue="Heart_Disease")
+sns.countplot(data=df, x="Age_Category", hue="Heart_Disease", order=age_order)
 plt.title("Heart_Disease por Age_Category")
 plt.xticks(rotation=45)
 plt.tight_layout()
+plt.savefig("output/06_heart_disease_por_age_category.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 # 13. Outliers com IQR
