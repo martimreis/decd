@@ -72,6 +72,28 @@ plt.tight_layout()
 plt.savefig("output/07_kmeans_metrics.png", dpi=200, bbox_inches="tight")
 plt.show()
 
+# gráfico 2D usando BMI e Weight_(kg) reais
+plot_df = df_clean.loc[X_plot.index, ["BMI", "Weight_(kg)"]].copy()
+plot_df["cluster"] = kmeans_plot_labels
+
+plt.figure(figsize=(9, 6))
+sns.scatterplot(
+    data=plot_df,
+    x="BMI",
+    y="Weight_(kg)",
+    hue="cluster",
+    palette="tab10",
+    s=35,
+    alpha=0.8
+)
+plt.title(f"K-Means em 2D (k={best_k})")
+plt.xlabel("BMI")
+plt.ylabel("Weight_(kg)")
+plt.legend(title="Cluster", bbox_to_anchor=(1.02, 1), loc="upper left")
+plt.tight_layout()
+plt.savefig("output/08_kmeans_clusters_2d.png", dpi=200, bbox_inches="tight")
+plt.show()
+
 plt.figure(figsize=(9, 6))
 plt.scatter(X_plot_pca[:, 0], X_plot_pca[:, 1], c=kmeans_plot_labels, cmap="tab10", s=18, alpha=0.8)
 plt.title(f"K-Means em PCA 2D (k={best_k})")
@@ -81,25 +103,7 @@ plt.colorbar(label="Cluster")
 plt.tight_layout()
 plt.savefig("output/08_kmeans_clusters_pca.png", dpi=200, bbox_inches="tight")
 plt.show()
-# ==================================================
-# 1.1) PERFIL DOS CLUSTERS DO K-MEANS POR ATRIBUTO
-# ==================================================
-df_kmeans = X_plot.copy()
-df_kmeans["cluster"] = kmeans_plot_labels
 
-print("\n--- MÉDIAS POR CLUSTER (K-MEANS) ---")
-print(df_kmeans.groupby("cluster").mean().round(2))
-
-print("\n--- MEDIANAS POR CLUSTER (K-MEANS) ---")
-print(df_kmeans.groupby("cluster").median().round(2))
-
-for col in df_kmeans.columns.drop("cluster"):
-    plt.figure(figsize=(10, 5))
-    sns.boxplot(data=df_kmeans, x="cluster", y=col)
-    plt.title(f"{col} por cluster - K-Means")
-    plt.tight_layout()
-    plt.savefig(f"output/kmeans_{col}_por_cluster.png", dpi=200, bbox_inches="tight")
-    plt.show()
 # ==================================================
 # 2) CLUSTERING HIERÁRQUICO
 # ==================================================
